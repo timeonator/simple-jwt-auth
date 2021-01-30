@@ -5,16 +5,7 @@ const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
 const getUser = require('./authService');
 var mysql = require('mysql')
-// var con = mysql.createConnection({
-//   host: 'localhost',
-//   user: 'root',
-//   password: 'lull5gogM#',
-//   database: 'pikto'
-// });
-// con.connect(function(err) {
-//     if (err) throw err;
-//     console.log("Connected!");
-//   });
+
 const userService = require('./authService');
 
 const accessTokenSecret = 'youraccesstokensecret';
