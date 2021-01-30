@@ -12,28 +12,7 @@ const accessTokenSecret = 'youraccesstokensecret';
 const refreshTokenSecret = 'yourrefreshtokensecrethere';
 var refreshTokens = [];
 
-const users = [
-    {
-        email: 'john',
-        password: 'password123admin',
-        role: 'admin'
-    }, {
-        email: 'anna',
-        password: 'password123member',
-        role: 'member'
-    }
-];
-// function getUser(email, password=''){
-//     console.log(email,password);
- 
-//     // Filter user from the users array by email and password
-//     const user = users.find(u => { return u.email === email && u.password === password });
-
-//     return user;  
-// }
-
 app.use(bodyParser.json());
-
 
 app.listen(3000, () => {
     console.log('Authentication service started on port 3000');
@@ -47,7 +26,6 @@ app.post('/login', (req, res) => {
         refreshToken = jwt.sign({ email: row.email }, refreshTokenSecret);
         return accessToken;
     }
-
 
     // Read email and password from request body
     const { email, password } = req.body;
