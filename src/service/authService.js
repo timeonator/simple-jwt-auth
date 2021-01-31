@@ -13,16 +13,12 @@ var sql = mysql.createConnection({
 function getUser(email, password, callback) {
     let query=`SELECT * FROM users WHERE email=\'${email}\' AND password=\'${password}\';`;
   
-    sql.connect(function(err) {
-        if (err) throw err;
-        console.log("Connected!");
-      });
-
     console.log(query);
     sql.query(query, function (err, result, fields) {
         if (err) {
             throw err;
         }
+
         callback(result[0]);
     });
 };
