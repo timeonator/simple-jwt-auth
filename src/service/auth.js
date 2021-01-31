@@ -19,7 +19,7 @@ app.listen(3000, () => {
 });
 
 app.post('/login', (req, res) => {
-    let accessToken="eat shit dog", refreshToken;
+    let accessToken="", refreshToken="";
     function table(row) {    
         console.log(accessToken);
         accessToken = jwt.sign({ email: row.email }, accessTokenSecret, {expiresIn: '12ms'});
