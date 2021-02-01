@@ -20,29 +20,32 @@ app.listen(3000, () => {
 
 app.post('/login', (req, res) => {
     let accessToken="", refreshToken="";
-    function table(row) {    
-        console.log(accessToken);
-        accessToken = jwt.sign({ email: row.email }, accessTokenSecret, {expiresIn: '12ms'});
-        refreshToken = jwt.sign({ email: row.email }, refreshTokenSecret);
-        return accessToken;
-    }
 
     // Read email and password from request body
     const { email, password } = req.body;
 
     // Filter user from the users array by email[] and password
-    getUser(email,password, row => {
-        console.log(accessToken);
-        accessToken = jwt.sign({ email: row.email }, accessTokenSecret, {expiresIn: '12ms'});
-        refreshToken = jwt.sign({ email: row.email }, refreshTokenSecret);
-        refreshTokens.push(refreshToken);
-        console.log(accessToken);
-        res.send({accessToken});
+    getUser(email,password, (err,table) => {
+
+        if(err || table.length<1) {
+            console.log("User account not found");
+            res.send("{}");
+        } else {
+            let row = table[0];
+            accessToken = jwt.sign({ email: row.email }, accessTokenSecret, {expiresIn: '12ms'});
+            refreshToken = jwt.sign({ email: row.email }, refreshTokenSecret);
+            refreshTokens.push(refreshToken);
+            console.log(accessToken);
+            res.send({accessToken});
+        }
     });
 });
 
 app.post('/logout', (req, res) => {
     const { refeshToken } = req.body;
+    if (!refreshToken) {
+        return res.sendStatus(401);
+    }
     console.log(refreshToken, refreshTokens);
     refreshTokens = refreshTokens.filter(t => t !== token);
     res.send("Logout successful");
