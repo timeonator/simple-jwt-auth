@@ -27,27 +27,32 @@ app.post('/login', (req, res) => {
     // Filter user from the users array by email[] and password
     getUser(email,password, (err,table) => {
 
-        if(err || table.length<1) {
+        if(table.length<1) {
             console.log("User account not found");
-            res.send("{}");
+            return res.sendStatus(403);
         } else {
             let row = table[0];
+
             accessToken = jwt.sign({ email: row.email }, accessTokenSecret, {expiresIn: '12ms'});
             refreshToken = jwt.sign({ email: row.email }, refreshTokenSecret);
             refreshTokens.push(refreshToken);
-            console.log(accessToken);
-            res.send({accessToken});
+            
+            console.log(refreshTokens);
+            res.send({accessToken, refreshToken});
         }
     });
 });
 
 app.post('/logout', (req, res) => {
-    const { refeshToken } = req.body;
-    if (!refreshToken) {
+
+    const { refreshToken } = req.body;
+    if (undefined === refreshToken) {
         return res.sendStatus(401);
     }
     console.log(refreshToken, refreshTokens);
-    refreshTokens = refreshTokens.filter(t => t !== token);
+    console.log("before ", refreshTokens);
+    refreshTokens = refreshTokens.filter(t => t !== refreshToken);
+    console.log("after ", refreshTokens);
     res.send("Logout successful");
 });
 
