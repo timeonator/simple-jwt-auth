@@ -10,7 +10,7 @@ var sql = mysql.createConnection({
     database: process.env.DB_DB
 });
 
-function getUser(email, password, callback) {
+function loginUser(email, password, callback) {
     let query=`SELECT * FROM users WHERE email=\'${email}\' AND password=\'${password}\';`;
   //    console.log(query);
     sql.query(query, function (err, result, fields) {
@@ -21,7 +21,7 @@ function getUser(email, password, callback) {
     });
 };
 
-module.exports = getUser;
+module.exports = loginUser;
 
 // app.get('/password/:pw', cors(corsOptions), (req, res) => {
 //     const saltRounds = 10;

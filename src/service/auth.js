@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
-const getUser = require('./authService');
+const loginUser = require('./authService');
 var mysql = require('mysql')
 
 const userService = require('./authService');
@@ -11,6 +11,25 @@ const userService = require('./authService');
 const accessTokenSecret = 'youraccesstokensecret';
 const refreshTokenSecret = 'yourrefreshtokensecrethere';
 var refreshTokens = [];
+
+const authenticateJWT = (req, res, next) => {
+    const authHeader = req.headers.authorization;
+
+    if (authHeader) {
+        const token = authHeader.split(' ')[1];
+
+        jwt.verify(token, accessTokenSecret, (err, user) => {
+            if (err) {
+                return res.sendStatus(403);
+            }
+
+            req.user = user;
+            next();
+        });
+    } else {
+        res.sendStatus(401);
+    }
+};
 
 app.use(bodyParser.json());
 
@@ -25,7 +44,7 @@ app.post('/login', (req, res) => {
     const { email, password } = req.body;
 
     // Filter user from the users array by email[] and password
-    getUser(email,password, (err,table) => {
+    loginUser(email,password, (err,table) => {
 
         if(table.length<1) {
             console.log("User account not found");
@@ -33,7 +52,7 @@ app.post('/login', (req, res) => {
         } else {
             let row = table[0];
 
-            accessToken = jwt.sign({ email: row.email }, accessTokenSecret, {expiresIn: '12ms'});
+            accessToken = jwt.sign({ email: row.email }, accessTokenSecret, {expiresIn: '60s'});
             refreshToken = jwt.sign({ email: row.email }, refreshTokenSecret);
             refreshTokens.push(refreshToken);
             
@@ -79,4 +98,9 @@ app.post('/token', (req, res) => {
             accessToken
         });
     });
+});
+
+app.get('/users', authenticateJWT, (req, res) => {
+    const { role } = req.user;
+    res.send(JSON.stringify({"hi":"hello my friend"}));
 });
