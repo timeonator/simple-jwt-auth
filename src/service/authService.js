@@ -21,7 +21,16 @@ function loginUser(email, password, callback) {
     });
 };
 
-module.exports = loginUser;
+function getUsers(callback) {
+    const query = "SELECT * FROM users";
+    sql.query(query, function (err, result, fields) {
+        if (err) throw err
+        console.log("Query Result: ", JSON.stringify(result));
+        callback(result);
+    });
+}
+
+module.exports = {loginUser, getUsers};
 
 // app.get('/password/:pw', cors(corsOptions), (req, res) => {
 //     const saltRounds = 10;

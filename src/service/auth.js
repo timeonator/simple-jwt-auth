@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
-const loginUser = require('./authService');
+const authService = require('./authService');
 var mysql = require('mysql')
 
 const userService = require('./authService');
@@ -44,7 +44,7 @@ app.post('/login', (req, res) => {
     const { email, password } = req.body;
 
     // Filter user from the users array by email[] and password
-    loginUser(email,password, (err,table) => {
+    authService.loginUser(email,password, (err,table) => {
 
         if(table.length<1) {
             console.log("User account not found");
@@ -52,8 +52,8 @@ app.post('/login', (req, res) => {
         } else {
             let row = table[0];
 
-            accessToken = jwt.sign({ email: row.email }, accessTokenSecret, {expiresIn: '60s'});
-            refreshToken = jwt.sign({ email: row.email }, refreshTokenSecret);
+            accessToken = jwt.sign({ email: row.email, role: row.role}, accessTokenSecret, {expiresIn: '2m'});
+            refreshToken = jwt.sign({ email: row.email, role: row.role }, refreshTokenSecret);
             refreshTokens.push(refreshToken);
             
             console.log(refreshTokens);
@@ -100,7 +100,14 @@ app.post('/token', (req, res) => {
     });
 });
 
-app.get('/users', authenticateJWT, (req, res) => {
+
+app.get('/users', authenticateJWT, (req,res) => {
     const { role } = req.user;
-    res.send(JSON.stringify({"hi":"hello my friend"}));
+    console.log("role ", req.user);
+    if (role !== 'admin') {
+        return res.sendStatus(403);
+    }
+    authService.getUsers(userList => {
+        res.send(JSON.stringify(userList));  
+    })
 });
