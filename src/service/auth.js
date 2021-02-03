@@ -75,6 +75,17 @@ app.post('/logout', (req, res) => {
     res.send("Logout successful");
 });
 
+app.post('/register', (req, res) => {
+    const {first_name,last_name,email,username,password,role} = req.body;
+    console.log("first_name ", first_name);
+    console.log("last_name ", last_name);
+    console.log('email', email);
+    console.log("username", username);
+    console.log("password", password);
+    console.log("role", role);
+    res.send("Welcome ");
+});
+
 app.post('/token', (req, res) => {
     const { token } = req.body;
     console.log(token);
