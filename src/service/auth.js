@@ -1,6 +1,7 @@
 "use strict"
 const express = require('express');
 const app = express();
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
 const authService = require('./authService');
@@ -31,6 +32,12 @@ const authenticateJWT = (req, res, next) => {
     }
 };
 
+function encrypt(pw) {
+    const saltRounds = 10;
+    let result = bcrypt.hashSync(pw, saltRounds);
+    return (result);
+}
+
 app.use(bodyParser.json());
 
 app.listen(3000, () => {
@@ -42,22 +49,27 @@ app.post('/login', (req, res) => {
 
     // Read email and password from request body
     const { email, password } = req.body;
-
+ 
     // Filter user from the users array by email[] and password
-    authService.loginUser(email,password, (err,table) => {
+    authService.loginUser(email, password , (err,table) => {
 
         if(table.length<1) {
             console.log("User account not found");
             return res.sendStatus(403);
         } else {
             let row = table[0];
+            if (bcrypt.compareSync(password, row.password)){
+                accessToken = jwt.sign({ email: row.email, role: row.role}, accessTokenSecret, {expiresIn: '2m'});
+                refreshToken = jwt.sign({ email: row.email, role: row.role }, refreshTokenSecret);
+                refreshTokens.push(refreshToken);
+                
+                console.log(refreshTokens);
+                res.send({accessToken, refreshToken});
+            } else {
+                res.sendStatus(401);
+            }
 
-            accessToken = jwt.sign({ email: row.email, role: row.role}, accessTokenSecret, {expiresIn: '2m'});
-            refreshToken = jwt.sign({ email: row.email, role: row.role }, refreshTokenSecret);
-            refreshTokens.push(refreshToken);
-            
-            console.log(refreshTokens);
-            res.send({accessToken, refreshToken});
+
         }
     });
 });
@@ -78,6 +90,7 @@ app.post('/logout', (req, res) => {
 app.post('/register', (req, res) => {
     let user = req.body;
     console.log(req.body);
+    user.password = encrypt(user.password);
     authService.registerUser(user,()=>{
         res.send("Welcome ");
     });

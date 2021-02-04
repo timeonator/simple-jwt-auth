@@ -9,9 +9,11 @@ var sql = mysql.createConnection({
     password: process.env.DB_PASSWORD, 
     database: process.env.DB_DB
 });
-
+//
+// get the user by unique email address
+//
 function loginUser(email, password, callback) {
-    let query=`SELECT * FROM users WHERE email=\'${email}\' AND password=\'${password}\';`;
+    let query=`SELECT * FROM users WHERE email=\'${email}\';`;
   //    console.log(query);
     sql.query(query, function (err, result, fields) {
         if (err) {
@@ -48,9 +50,9 @@ function registerUser(user, callback) {
                 user.role
             ], function(err, result, fields) {
                   if (err) throw err;
-                  res.send(JSON.stringify(result));
-              });
-    callback();
+        callback();
+    });
+
 
     // let query=`insert into users set users.email = ?, users.password=?`;
     // sql.query(query,[req.body.email,req.body.password], function(err, result, fields) {
