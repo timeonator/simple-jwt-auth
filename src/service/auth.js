@@ -25,6 +25,7 @@ const authenticateJWT = (req, res, next) => {
             }
 
             req.user = user;
+            console.log(user);
             next();
         });
     } else {
@@ -59,7 +60,7 @@ app.post('/login', (req, res) => {
         } else {
             let row = table[0];
             if (bcrypt.compareSync(password, row.password)){
-                accessToken = jwt.sign({ email: row.email, role: row.role}, accessTokenSecret, {expiresIn: '2m'});
+                accessToken = jwt.sign({ email: row.email, role: row.role}, accessTokenSecret, {expiresIn: '20m'});
                 refreshToken = jwt.sign({ email: row.email, role: row.role }, refreshTokenSecret);
                 refreshTokens.push(refreshToken);
                 
