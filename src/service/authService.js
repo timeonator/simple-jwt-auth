@@ -30,7 +30,36 @@ function getUsers(callback) {
     });
 }
 
-module.exports = {loginUser, getUsers};
+function registerUser(user, callback) {
+    console.log("Service : ", user);
+    let query=`insert into users set first_name=?,
+        last_name=?,
+        email=?, 
+        username=?, 
+        password=?, 
+        role=?`;
+        sql.query(query,
+            [
+                user.first_name,
+                user.last_name,
+                user.email,
+                user.username,
+                user.password,
+                user.role
+            ], function(err, result, fields) {
+                  if (err) throw err;
+                  res.send(JSON.stringify(result));
+              });
+    callback();
+
+    // let query=`insert into users set users.email = ?, users.password=?`;
+    // sql.query(query,[req.body.email,req.body.password], function(err, result, fields) {
+    //       if (err) throw err;
+    //       res.send(JSON.stringify(result));
+    //   });
+}
+
+module.exports = {loginUser, getUsers, registerUser};
 
 // app.get('/password/:pw', cors(corsOptions), (req, res) => {
 //     const saltRounds = 10;

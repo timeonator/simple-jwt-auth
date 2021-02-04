@@ -76,14 +76,12 @@ app.post('/logout', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-    const {first_name,last_name,email,username,password,role} = req.body;
-    console.log("first_name ", first_name);
-    console.log("last_name ", last_name);
-    console.log('email', email);
-    console.log("username", username);
-    console.log("password", password);
-    console.log("role", role);
-    res.send("Welcome ");
+    let user = req.body;
+    console.log(req.body);
+    authService.registerUser(user,()=>{
+        res.send("Welcome ");
+    });
+
 });
 
 app.post('/token', (req, res) => {
