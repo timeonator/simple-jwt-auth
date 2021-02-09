@@ -1,4 +1,5 @@
 "use strict"
+const cors = require('cors');
 const express = require('express');
 const app = express();
 const bcrypt = require('bcrypt');
@@ -6,8 +7,12 @@ const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
 const authService = require('./authService');
 var mysql = require('mysql')
-
 const userService = require('./authService');
+
+var corsOptions = {
+    Origin: 'http://localhost:3000',
+    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+  }
 
 const accessTokenSecret = 'youraccesstokensecret';
 const refreshTokenSecret = 'yourrefreshtokensecrethere';
@@ -35,17 +40,23 @@ const authenticateJWT = (req, res, next) => {
 
 function encrypt(pw) {
     const saltRounds = 10;
+    console.log("encrypt ", pw);
     let result = bcrypt.hashSync(pw, saltRounds);
     return (result);
 }
 
 app.use(bodyParser.json());
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  });
 
-app.listen(3000, () => {
-    console.log('Authentication service started on port 3000');
+app.listen(3001, () => {
+    console.log('Authentication service started on port 3001');
 });
 
-app.post('/login', (req, res) => {
+app.post('/login', cors(corsOptions), (req, res) => {
     let accessToken="", refreshToken="";
 
     // Read email and password from request body
@@ -88,7 +99,7 @@ app.post('/logout', (req, res) => {
     res.send("Logout successful");
 });
 
-app.post('/register', (req, res) => {
+app.post('/register', cors({Origin: 'http://localhost:3000'}), (req, res) => {
     let user = req.body;
     console.log(req.body);
     user.password = encrypt(user.password);
