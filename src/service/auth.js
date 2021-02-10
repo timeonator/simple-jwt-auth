@@ -40,7 +40,7 @@ const authenticateJWT = (req, res, next) => {
 
 function encrypt(pw) {
     const saltRounds = 10;
-    console.log("encrypt ", pw);
+    console.log("authService.encrypt ", pw);
     let result = bcrypt.hashSync(pw, saltRounds);
     return (result);
 }
@@ -101,10 +101,10 @@ app.post('/logout', (req, res) => {
 
 app.post('/register', cors({Origin: 'http://localhost:3000'}), (req, res) => {
     let user = req.body;
-    console.log(req.body);
+//    console.log(req.body);
     user.password = encrypt(user.password);
-    authService.registerUser(user,()=>{
-        res.send("Welcome ");
+    authService.registerUser(user,(status)=>{
+        res.send("Welcome");
     });
 
 });

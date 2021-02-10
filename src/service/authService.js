@@ -27,13 +27,25 @@ function getUsers(callback) {
     const query = "SELECT * FROM users";
     sql.query(query, function (err, result, fields) {
         if (err) throw err
-        console.log("Query Result: ", JSON.stringify(result));
+        // console.log("Query Result: ", JSON.stringify(result));
         callback(result);
     });
 }
-
+function emailTaken(user) {
+    let query=`select * from users where users.email=?`;
+    sql.query(query,[user.email],function(err, result, fields) {
+        if (err) throw err;
+        if(result.length === 0) return false;
+        else return true;
+    });
+}
 function registerUser(user, callback) {
-    console.log("Service : ", user);
+    // console.log("Service : ", user);
+    // if(emailTaken(user)){
+    //     console.log("Email is taken");
+    //     callback(409); // Conflict
+    //     return;
+    // }
     let query=`insert into users set first_name=?,
         last_name=?,
         email=?, 
@@ -49,8 +61,9 @@ function registerUser(user, callback) {
                 user.password,
                 user.role
             ], function(err, result, fields) {
-                  if (err) throw err;
-        callback();
+                if (err) throw err;
+                // console.log("Result: ", result);
+                callback();
     });
 
 }
