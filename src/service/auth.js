@@ -73,7 +73,7 @@ app.post('/login', (req, res) => {
                 refreshToken = jwt.sign({ email: row.email, role: row.role }, refreshTokenSecret);
                 refreshTokens.push(refreshToken);                
                 console.log(refreshTokens);
-                res.send(JSON.stringify({token:accessToken}));
+                res.json({accessToken,refreshToken});
             } else {
                 res.sendStatus(401);
             }
@@ -89,7 +89,7 @@ app.post('/logout', (req, res) => {
     if (undefined === refreshToken) {
         return res.sendStatus(401);
     }
-    refreshTokens = refreshTokens.filter(t => t !== refreshToken);
+    refreshTokens = refreshTokens.filter(t => t != refreshToken);
     console.log(refreshToken, refreshTokens);
     res.send("Logout successful");
 });
