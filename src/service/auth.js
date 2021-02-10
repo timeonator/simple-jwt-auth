@@ -28,9 +28,8 @@ const authenticateJWT = (req, res, next) => {
             if (err) {
                 return res.sendStatus(403);
             }
-
             req.user = user;
-            console.log(user);
+            // console.log(user);
             next();
         });
     } else {
@@ -40,7 +39,6 @@ const authenticateJWT = (req, res, next) => {
 
 function encrypt(pw) {
     const saltRounds = 10;
-    console.log("authService.encrypt ", pw);
     let result = bcrypt.hashSync(pw, saltRounds);
     return (result);
 }
@@ -56,9 +54,9 @@ app.listen(3001, () => {
     console.log('Authentication service started on port 3001');
 });
 
-app.post('/login', cors(corsOptions), (req, res) => {
+app.post('/login', (req, res) => {
     let accessToken="", refreshToken="";
-
+    // console.log(req.body);
     // Read email and password from request body
     const { email, password } = req.body;
  
@@ -73,10 +71,9 @@ app.post('/login', cors(corsOptions), (req, res) => {
             if (bcrypt.compareSync(password, row.password)){
                 accessToken = jwt.sign({ email: row.email, role: row.role}, accessTokenSecret, {expiresIn: '20m'});
                 refreshToken = jwt.sign({ email: row.email, role: row.role }, refreshTokenSecret);
-                refreshTokens.push(refreshToken);
-                
+                refreshTokens.push(refreshToken);                
                 console.log(refreshTokens);
-                res.send({accessToken, refreshToken});
+                res.send(JSON.stringify({token:accessToken}));
             } else {
                 res.sendStatus(401);
             }
@@ -92,10 +89,8 @@ app.post('/logout', (req, res) => {
     if (undefined === refreshToken) {
         return res.sendStatus(401);
     }
-    console.log(refreshToken, refreshTokens);
-    console.log("before ", refreshTokens);
     refreshTokens = refreshTokens.filter(t => t !== refreshToken);
-    console.log("after ", refreshTokens);
+    console.log(refreshToken, refreshTokens);
     res.send("Logout successful");
 });
 

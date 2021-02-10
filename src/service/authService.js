@@ -14,7 +14,7 @@ var sql = mysql.createConnection({
 //
 function loginUser(email, password, callback) {
     let query=`SELECT * FROM users WHERE email=\'${email}\';`;
-  //    console.log(query);
+     console.log("loginUser: ", email, password);
     sql.query(query, function (err, result, fields) {
         if (err) {
             console.log(err.code)
